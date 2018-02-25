@@ -1,0 +1,38 @@
+-- This file has been generated from package.yaml by hpack version 0.27.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: cfcd4b2bebed1581f478012df0212fde9f5b129de940a08d8ed69392878cdde3
+
+name:           robot-position
+version:        0.1.0.0
+license:        BSD3
+build-type:     Simple
+cabal-version:  >= 1.10
+
+data-files:
+    src/exe/track.txt
+
+library
+  other-modules:
+      Paths_robot_position
+  hs-source-dirs:
+      src/lib
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
+  build-depends:
+      base >=4.7 && <5
+    , random
+  default-language: Haskell2010
+
+executable robot-position
+  main-is: Main.hs
+  other-modules:
+      Paths_robot_position
+  hs-source-dirs:
+      src/exe/
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
+  build-depends:
+      base >=4.7 && <5
+    , random
+    , robot-position
+  default-language: Haskell2010
