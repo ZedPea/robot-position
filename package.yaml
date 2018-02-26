@@ -3,7 +3,7 @@ version:             0.1.0.0
 license:             BSD3
 
 data-files:
-- src/exe/track.txt
+- src/exe/compact/track.txt
 
 dependencies:
 - base >= 4.7 && < 5
@@ -21,8 +21,14 @@ library:
   source-dirs: src/lib
 
 executables:
-  robot-position:
+  robot-position-compact:
     main:                Main.hs
-    source-dirs:         src/exe/
+    source-dirs:         src/exe/compact
+    dependencies:
+    - robot-position
+
+  robot-position-readable:
+    main:                Main.hs
+    source-dirs:         src/exe/readable
     dependencies:
     - robot-position
