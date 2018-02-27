@@ -32,3 +32,10 @@ executables:
     source-dirs:         src/exe/readable
     dependencies:
     - robot-position
+
+  robot-position-fast:
+    main:                Main.hs
+    source-dirs:         src/exe/fast
+    dependencies:
+    - robot-position
+    - hmatrix

@@ -8,6 +8,7 @@ import System.Random (getStdRandom, randomR)
 import Control.Monad (replicateM)
 import Data.List (tails)
 import Text.Printf (printf)
+import Debug.Trace (trace)
 
 import Paths_robot_position (getDataFileName)
 
@@ -35,12 +36,12 @@ main = do
     writeFile "output.txt" output
 
 numInputs :: Int
-numInputs = 3
+numInputs = 7
 
 trainWhile :: Neuron -> [[Input]] -> [Expected] -> Neuron
 trainWhile neuron windows expected
-    | loss < 1.1 = newNeuron
-    | otherwise = trainWhile newNeuron windows expected
+    | loss < 0.5 = newNeuron
+    | otherwise = trace ("Loss = " ++ show loss) (trainWhile newNeuron windows expected)
     where newNeuron = train neuron windows expected
           loss = 0.5 * sum (map (**2) $ zipWith (-) expected output)
           output = neuronOutput neuron windows
