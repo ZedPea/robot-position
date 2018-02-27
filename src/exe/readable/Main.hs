@@ -23,7 +23,7 @@ newtype Neuron = Neuron {
 
 main :: IO ()
 main = do
-    input <- map read . lines <$> (readFile =<< getDataFileName "src/exe/Compact/track.txt")
+    input <- map read . lines <$> (readFile =<< getDataFileName "src/exe/compact/track.txt")
     neuron <- Neuron <$> createRandomWeights 
 
     let windows = prepareInputs input
