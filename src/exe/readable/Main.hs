@@ -36,11 +36,14 @@ main = do
     writeFile "output.txt" output
 
 numInputs :: Int
-numInputs = 7
+numInputs = 6
+
+learningRate :: Double
+learningRate = 0.01
 
 trainWhile :: Neuron -> [[Input]] -> [Expected] -> Neuron
 trainWhile neuron windows expected
-    | loss < 0.5 = newNeuron
+    | loss < 0.52 = newNeuron
     | otherwise = trace ("Loss = " ++ show loss) (trainWhile newNeuron windows expected)
     where newNeuron = train neuron windows expected
           loss = 0.5 * sum (map (**2) $ zipWith (-) expected output)
@@ -55,7 +58,7 @@ neuronOutput = map . ((sigmoid . sum) .) . zipWith (*) . weights
 
 adjustWeights :: [Input] -> Output -> Error -> Neuron -> Neuron
 adjustWeights inputs output errorVal = Neuron . zipWith (+) adjustment . weights
-    where adjustment = map (errorVal * sigmoid' output *) inputs
+    where adjustment = map (learningRate * errorVal * sigmoid' output *) inputs
           sigmoid' x = x * (1 - x)
 
 train :: Neuron -> [[Input]] -> [Expected] -> Neuron
