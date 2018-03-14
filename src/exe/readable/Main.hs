@@ -8,7 +8,10 @@ import System.Random (getStdRandom, randomR)
 import Control.Monad (replicateM)
 import Data.List (tails)
 import Text.Printf (printf)
-import Debug.Trace (trace)
+import Control.Concurrent (forkIO)
+import Control.Concurrent.MVar (MVar, putMVar, newEmptyMVar, isEmptyMVar)
+import Graphics.Rendering.Chart.Easy
+import Graphics.Rendering.Chart.Backend.Cairo
 
 import Paths_robot_position (getDataFileName)
 
@@ -27,27 +30,60 @@ main = do
     input <- map read . lines <$> (readFile =<< getDataFileName "src/exe/compact/track.txt")
     neuron <- Neuron <$> createRandomWeights 
 
+    dieMVar <- newEmptyMVar
+
+    forkIO $ exitWatcher dieMVar
+
     let windows = prepareInputs input
     -- can't predict the first result as no inputs for it so just skip it
-        trainedNeuron = trainWhile neuron windows (tail input)
-        results = neuronOutput trainedNeuron windows
+
+    trainedNeuron <- trainWhile neuron windows (tail input) dieMVar
+
+    let results = neuronOutput trainedNeuron windows
         output = concat $ zipWith (printf "%f predicted to be %f\n") (tail input) results
 
+    putStrLn "Wrote predictions to output.txt"
     writeFile "output.txt" output
 
+    putStrLn "Wrote graph to graph.png"
+    writeGraph (tail input) results
+
+    putStrLn "Bye."
+
+writeGraph :: [Expected] -> [Output] -> IO ()
+writeGraph expected results = toFile def "graph.png" $ do
+    layout_title .= "Robot Position"
+    plot (line "Actual" [zip ([1..] :: [Int]) expected])
+    plot (line "Predicted" [zip [1..] results])
+
+exitWatcher :: MVar Bool -> IO ()
+exitWatcher dieMVar = do
+    input <- getLine
+    if input == "exit"
+        then do
+            putMVar dieMVar True
+            return ()
+        else exitWatcher dieMVar
+
 numInputs :: Int
-numInputs = 6
+numInputs = 3
 
 learningRate :: Double
 learningRate = 0.01
 
-trainWhile :: Neuron -> [[Input]] -> [Expected] -> Neuron
-trainWhile neuron windows expected
-    | loss < 0.52 = newNeuron
-    | otherwise = trace ("Loss = " ++ show loss) (trainWhile newNeuron windows expected)
-    where newNeuron = train neuron windows expected
-          loss = 0.5 * sum (map (**2) $ zipWith (-) expected output)
-          output = neuronOutput neuron windows
+trainWhile :: Neuron -> [[Input]] -> [Expected] -> MVar Bool -> IO Neuron
+trainWhile neuron windows expected dieMVar = do
+    die <- not <$> isEmptyMVar dieMVar
+    if die
+        then return neuron
+        else do
+            let newNeuron = train neuron windows expected
+                output = neuronOutput neuron windows
+                loss = 0.5 * sum (map (**2) $ zipWith (-) expected output)
+
+            putStrLn $ "Loss = " ++ show loss
+
+            trainWhile newNeuron windows expected dieMVar
 
 createRandomWeights :: IO [Weight]
 createRandomWeights = replicateM numInputs $ getStdRandom (randomR (-1, 1))

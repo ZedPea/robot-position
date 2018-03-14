@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1bed5ba8f600b602c9dce9347f7b59c20e6d2db4810cd6aae4059d7b1fc91d51
+-- hash: acf5fe808ff0cc116fb07b8d8b5047acc5a96624f6ba24e897fd3b98f2c065eb
 
 name:           robot-position
 version:        0.1.0.0
@@ -59,7 +59,9 @@ executable robot-position-readable
       src/exe/readable
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
   build-depends:
-      base >=4.7 && <5
+      Chart
+    , Chart-cairo
+    , base >=4.7 && <5
     , random
     , robot-position
   default-language: Haskell2010

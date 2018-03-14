@@ -32,6 +32,8 @@ executables:
     source-dirs:         src/exe/readable
     dependencies:
     - robot-position
+    - Chart
+    - Chart-cairo
 
   robot-position-fast:
     main:                Main.hs
